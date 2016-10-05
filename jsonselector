@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# This is a simple script to print select attribs of a json blob
+
 import json
 import optparse
 import sys
@@ -39,10 +41,19 @@ def main():
     parser.add_option("-p", "--pretty", action="store_true", default=False,
         help="output will be pretty json")
 
+    parser.add_option("-s", "--schema", action="store_true", default=False,
+        help="output json keys")
+
     (options, args) = parser.parse_args()
     
     for line in sys.stdin.readlines():
         results = process(line.strip(), args)
+
+        if options.schema:
+            # might want to make this print out schem of complex data
+            print('\t'.join(map(str,[x for x in results.keys()])))
+            continue
+
         if options.tabs:
             print('\t'.join(map(str,[x for x in results.values()])))
         elif options.pretty:
