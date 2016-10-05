@@ -11,17 +11,19 @@ def process(line, attributes):
     results = {}
 
     if attributes:
-        ref = data
         for attrib in attributes:
+            ref = data
             for part in attrib.split('.'):
                 if part in ref:
                     ref = ref[part]
             if ref:
                 results[attrib] = ref
+    # dump everything
     else:
         results = data
+
+    return results
           
-    print json.dumps(results)
 
 
 def main():
@@ -31,13 +33,22 @@ def main():
     parser.add_option("-d", "--default", metavar="NUMBER", type="float", 
         help="if specified it will be used for null/undef values")
 
+    parser.add_option("-t", "--tabs", action="store_true", default=False,
+        help="output will be values tab seperated")
+
     parser.add_option("-p", "--pretty", action="store_true", default=False,
         help="output will be pretty json")
 
     (options, args) = parser.parse_args()
     
     for line in sys.stdin.readlines():
-        process(line.strip(), args)
+        results = process(line.strip(), args)
+        if options.tabs:
+            print('\t'.join(map(str,[x for x in results.values()])))
+        elif options.pretty:
+            print json.dumps(results, indent=4)
+        else:
+            print json.dumps(results)
 
 if __name__ == '__main__':
     try:
